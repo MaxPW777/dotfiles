@@ -14,6 +14,7 @@ new_cwd = "follow"
 [theme]
 # Herdr's built-in dark Catppuccin theme is the Mocha palette.
 name = "catppuccin"
+auto_switch = false
 
 [update]
 channel = "stable"
@@ -28,7 +29,6 @@ settings = "prefix+shift+s"
 detach = "prefix+d"
 reload_config = "prefix+r"
 goto = "prefix+slash"
-open_notification_target = "prefix+o"
 
 # Workspace controls:
 #   prefix+w       choose workspace
@@ -119,6 +119,38 @@ type = "plugin_action"
 command = "vim-herdr-navigation.right"
 description = "Navigate right (Vim/Herdr)"
 
+# Plannotator terminal annotations.
+[[keys.command]]
+key = "prefix+a"
+type = "plugin_action"
+command = "annotate.capture"
+description = "Annotate terminal text"
+
+[[keys.command]]
+key = "prefix+shift+a"
+type = "plugin_action"
+command = "annotate.copy-context"
+description = "Copy annotations as context"
+
+[[keys.command]]
+key = "prefix+m"
+type = "plugin_action"
+command = "annotate.manage"
+description = "Manage annotations"
+
+# Plannotator document and agent-reply review.
+[[keys.command]]
+key = "prefix+o"
+type = "plugin_action"
+command = "annotate.open"
+description = "Review documents in this folder"
+
+[[keys.command]]
+key = "prefix+shift+o"
+type = "plugin_action"
+command = "annotate.last"
+description = "Review the agent's last reply"
+
 # Match tmux's three-cell prefix+arrow pane resizing.
 [[keys.command]]
 key = "prefix+left"
@@ -176,6 +208,8 @@ command = "herdr workspace create --label kim --focus"
 description = "Open Kim in a new remote workspace"
 
 [ui]
+# Distinguish Ghostty tabs by Herdr workspace and the focused pane title.
+window_title = "{workspace}: {terminal_title}"
 sidebar_width = 32
 sidebar_min_width = 18
 sidebar_max_width = 36
@@ -187,7 +221,7 @@ confirm_close = false
 prompt_new_tab_name = true
 prompt_new_workspace_name = true
 
-show_agent_labels_on_pane_borders = false
+show_agent_labels_on_pane_borders = true
 agent_panel_sort = "spaces"
 
 [ui.sidebar.spaces]
