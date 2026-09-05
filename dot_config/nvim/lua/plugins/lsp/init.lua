@@ -77,6 +77,7 @@ return {
         "biome",
         "cssls",
         "dockerls",
+        "elixirls",
         "eslint",
         "gopls",
         "html",

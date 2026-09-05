@@ -15,6 +15,10 @@ local function expect(condition, message)
   end
 end
 
+local function same_path(left, right)
+  return vim.uv.fs_realpath(left) == vim.uv.fs_realpath(right)
+end
+
 local repo = vim.fs.joinpath(temp, "repo")
 local package_root = vim.fs.joinpath(repo, "packages", "app")
 local source = vim.fs.joinpath(package_root, "src", "app.test.ts")
@@ -31,12 +35,40 @@ package.loaded.neotest = { run = {
   end,
 } }
 local neotest_spec = dofile(vim.fs.joinpath(root, "lua", "plugins", "testing", "neotest.lua"))
-for _, key in ipairs(neotest_spec.keys) do
-  if key[1] == "<leader>tF" then
-    key[2]()
+local function run_project()
+  ran = nil
+  for _, key in ipairs(neotest_spec.keys) do
+    if key[1] == "<leader>tF" then
+      key[2]()
+    end
   end
+  return ran
 end
-expect(ran == package_root, "run project did not select the nearest project root")
+expect(same_path(run_project(), package_root), "run project did not select the nearest JavaScript project root")
+
+local umbrella_root = vim.fs.joinpath(repo, "umbrella")
+local mix_root = vim.fs.joinpath(umbrella_root, "apps", "demo")
+local elixir_source = vim.fs.joinpath(mix_root, "test", "demo_test.exs")
+vim.fn.mkdir(vim.fs.dirname(elixir_source), "p")
+vim.fn.writefile({ "defmodule DemoTest do", "end" }, elixir_source)
+vim.fn.writefile({ "defmodule Umbrella.MixProject do", "end" }, vim.fs.joinpath(umbrella_root, "mix.exs"))
+vim.fn.writefile({ "defmodule Demo.MixProject do", "end" }, vim.fs.joinpath(mix_root, "mix.exs"))
+vim.cmd.edit(vim.fn.fnameescape(elixir_source))
+expect(same_path(run_project(), mix_root), "run project did not select the nearest Mix project root")
+
+local lsp_root
+local elixirls = dofile(vim.fs.joinpath(root, "lsp", "elixirls.lua"))
+elixirls.root_dir(0, function(path)
+  lsp_root = path
+end)
+expect(same_path(lsp_root, umbrella_root), "ElixirLS did not select the umbrella project root")
+
+local tailwind = dofile(vim.fs.joinpath(root, "lsp", "tailwindcss.lua"))
+for _, ft in ipairs({ "elixir", "eelixir", "heex" }) do
+  expect(vim.tbl_contains(tailwind.filetypes, ft), "Tailwind CSS omitted the " .. ft .. " filetype")
+end
+expect(vim.tbl_contains(tailwind.root_markers, "mix.exs"), "Tailwind CSS omitted Mix project roots")
+expect(tailwind.settings.tailwindCSS.includeLanguages.heex == "phoenix-heex", "Tailwind CSS omitted HEEx mapping")
 
 local adapter_options = {}
 for _, name in ipairs({ "neotest-jest", "neotest-vitest", "neotest-mocha", "neotest-golang" }) do
@@ -45,8 +77,14 @@ for _, name in ipairs({ "neotest-jest", "neotest-vitest", "neotest-mocha", "neot
     return {}
   end
 end
-package.loaded.neotest.setup = function() end
+local elixir_adapter = { name = "neotest-elixir" }
+package.loaded["neotest-elixir"] = elixir_adapter
+local configured_adapters
+package.loaded.neotest.setup = function(opts)
+  configured_adapters = opts.adapters
+end
 neotest_spec.config()
+expect(configured_adapters[1] == elixir_adapter, "neotest-elixir adapter was not registered")
 vim.cmd.enew()
 for _, name in ipairs({ "neotest-jest", "neotest-mocha" }) do
   expect(adapter_options[name].cwd(source) == package_root, name .. " ignored the test path when selecting cwd")
