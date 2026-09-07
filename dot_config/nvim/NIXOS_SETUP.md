@@ -45,8 +45,6 @@ home.packages = with pkgs; [
   clang-tools
   delve
   dockerfile-language-server
-  elixir
-  elixir-ls
   gopls
   golangci-lint
   hadolint
@@ -83,7 +81,6 @@ its native binary download/build remains an explicit exception to Nix-owned exec
 - `biome`
 - `cssls`
 - `dockerls`
-- `elixirls`
 - `eslint`
 - `gopls`
 - `html`
@@ -102,9 +99,7 @@ Server-specific settings live in `lsp/*.lua`.
 
 ## Formatters And Linters
 
-Formatting is configured in `lua/plugins/style/autoformat.lua` through conform.nvim.
-Elixir, EEx, HEEx, and Surface files use `mix format`. Go formatting uses
-`goimports` and `gofmt`.
+Formatting is configured in `lua/plugins/style/autoformat.lua` through conform.nvim. Go formatting is owned by conform.nvim with `goimports` and `gofmt`.
 
 Save formatting and both `<leader>cf` / `<leader>cF` use the same selection policy.
 For web filetypes, a project Biome config selects Biome only for its configured
@@ -133,10 +128,9 @@ JavaScript debugging looks for `js-debug`, `js-debug-adapter`, or Mason's `js-de
 
 Rust debugging prompts for the built executable rather than guessing from Cargo.toml;
 argument input uses nvim-dap's quoted-argument parser. Build the desired target first.
-Neotest's project key selects the nearest Mix/package/Go/Cargo/VCS root. Elixir
-tests run through the `neotest-elixir` adapter and the project's `mix test`.
-Jest and Mocha derive their working directory from the test path, and adapters
-discover their own commands instead of forcing every package through `npm test`.
+Neotest's project key selects the nearest package/Go/Cargo/VCS root. Jest and Mocha
+derive their working directory from the test path, and adapters discover their own
+commands instead of forcing every package through `npm test`.
 
 ## Large Files And VS Code
 
@@ -169,8 +163,6 @@ Use shell checks to verify tools are on PATH:
 
 ```bash
 which astro-ls
-which elixir-ls
-which mix
 which gopls
 which lua-language-server
 which prettierd

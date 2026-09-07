@@ -83,10 +83,6 @@ return {
     local formatters_by_ft = {
       lua = { "stylua" },
       nix = { "alejandra" },
-      elixir = { "mix" },
-      eelixir = { "mix" },
-      heex = { "mix" },
-      surface = { "mix" },
       go = { "goimports", "gofmt" },
       c = { "clang_format" },
       cpp = { "clang_format" },

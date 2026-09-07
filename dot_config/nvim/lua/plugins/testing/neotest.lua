@@ -4,7 +4,7 @@ local function project_root(path)
     path = vim.fn.getcwd()
   end
 
-  return vim.fs.root(path, { "mix.exs", "package.json", "go.mod", "Cargo.toml", ".git", ".jj" }) or vim.fn.getcwd()
+  return vim.fs.root(path, { "package.json", "go.mod", "Cargo.toml", ".git", ".jj" }) or vim.fn.getcwd()
 end
 
 return {
@@ -17,7 +17,6 @@ return {
     "marilari88/neotest-vitest",
     "adrigzr/neotest-mocha",
     "fredrikaverpil/neotest-golang",
-    "jfpedroza/neotest-elixir",
   },
   keys = {
     {
@@ -80,7 +79,6 @@ return {
   config = function()
     require("neotest").setup({
       adapters = {
-        require("neotest-elixir"),
         require("neotest-jest")({ cwd = project_root }),
         require("neotest-vitest")({
           filter_dir = function(name, rel_path, root)

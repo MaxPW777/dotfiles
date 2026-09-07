@@ -98,10 +98,6 @@ for _, name in ipairs({ "eslint.config.ts", "eslint.config.mts", "eslint.config.
   expect(vim.tbl_contains(tooling.eslint, name), name .. " was not registered")
 end
 
-for _, ft in ipairs({ "elixir", "eelixir", "heex", "surface" }) do
-  expect(table.concat(opts.formatters_by_ft[ft], ",") == "mix", ft .. " did not select mix format")
-end
-
 local c = fixture("c", {}, "main.c", "c")
 expect(opts.format_on_save(c).lsp_format == "never", "C enabled LSP fallback")
 
